@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ragdollcatstudio.mapper.EmpMapper">
+    <sql id="commonSelect">
+        select id, username, password, name, gender, image, job, entrydate, dept_id, create_time, update_time
+        from emp
+    </sql>
+
+    <!-- <where></where> 标签会帮我们加上 and -->
+    <select id="selectByList" resultType="com.ragdollcatstudio.pojo.Emp">
+        <include refid="commonSelect"/>
+        <where>
+            <if test="name != null">
+                name like concat('%', #{name}, '%')
+            </if>
+            <if test="gender != null">
+                gender = #{gender}
+            </if>
+            <if test="begin != null ans end != null">
+                entrydate between #{begin} and #{end}
+            </if>
+        </where>
+        order by update_time desc
+    </select>
+
+    <!-- <set></set> 标签会帮我们去除逗号(,) -->
+    <update id="newUpdate">
+        update emp
+        <set>
+            <if test="username != null">username = #{username},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="gender != null">gender = #{gender},</if>
+            <if test="image != null">image = #{image},</if>
+            <if test="job != null">job = #{job},</if>
+            <if test="entryDate != null">entrydate = #{entryDate},</if>
+            <if test="deptId != null">dept_id = #{deptId},</if>
+            <if test="updateTime != null">update_time = #{updateTime}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <!--
+        循环遍历
+            collection  集合
+            item        元素
+            separator   分隔符
+            open        遍历开始前拼接的 SQL
+            close       遍历结束后拼接的 SQL
+    -->
+    <delete id="deleteByIdList">
+        delete from emp where id in
+        <foreach collection="idList" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>
